@@ -1,0 +1,69 @@
+Proyecto Automatización de Pruebas para API REST de la plataforma "Pet Store" con Karate DSL
+
+1.Informe de Hallazgos:
+
+• H01: Gestión inconsistente de parámetros requeridos (/pet/findByStatus)
+
+ -Descripción: Al enviar valores de estado inválidos (null, caracteres especiales,vacíos), la API responde con 200 OK y un cuerpo vacío [] en lugar del error esperado 400 Bad Request.
+ -Impacto: Permite consultas técnicamente incorrectas, lo que puede ocultar errores de lógica en las aplicaciones cliente.
+ -Recomendación: Validar que el valor del estado pertenezca al enum definido (available, pending, sold) y retornar 400 en caso contrario.
+
+• H02: Inconsistencia en códigos de error para consultas por ID
+
+ -Descripción: Consultas con parámetros inválidos en /pet/{petId} devuelven errores 405 o 404 en lugar del semánticamente correcto 400 Bad Request.
+ -Impacto: Dificulta la integración, ya que el cliente no puede diferenciar entre una petición mal formulada y un recurso inexistente.
+ -Recomendación: Estandarizar la validación de entrada en el controlador para retornar 400 ante formatos de ID inválidos.
+
+• H03: Inconsistencia entre documentación (Swagger) y respuesta real
+
+ -Descripción: La documentación indica que el 200 OK debe incluir un mensaje de confirmación, pero la API solo retorna el objeto de la mascota.
+ -Impacto: Fuerza a las aplicaciones consumidoras a manejar respuestas de forma inconsistente respecto al contrato.
+ -Recomendación: Sincronizar el contrato OpenAPI con la respuesta real del backend.
+
+• H04: Fallo en la validación de tipos (petId)
+
+ -Descripción: Enviar un string donde se espera un integer en /pet/{petId} provoca un 404 Not Found en lugar de 400 Bad Request.
+ -Impacto: El uso incorrecto del 404 para errores de formato contraviene los estándares REST.
+ -Recomendación: Implementar validación estricta de tipos de datos en la capa de entrada.
+
+• H05: Gestión de métodos no soportados
+
+ -Descripción: Realizar peticiones en endpoints no configurados devuelve un 415 Unsupported Media Type en lugar de 405 Method Not Allowed.
+ -Impacto: Desorienta al desarrollador sobre el origen del fallo (tipo de medio vs. método HTTP).
+ -Recomendación: Configurar el servidor para que el router o el controlador intercepten correctamente los métodos HTTP no permitidos y retornen un 405 Method Not Allowed, incluyendo en la cabecera Allow los métodos que sí están soportados.
+
+• H06: Ausencia de validación de esquema
+
+ -Descripción: La API permite enviar valores numéricos en campos definidos como string (ej. name), devolviendo 200 OK.
+ -Impacto: Degrada la calidad y consistencia de los datos almacenados.
+ -Recomendación: Implementar validación estricta de esquema (schema validation) en el contrato.
+
+• H07: Falta de idempotencia en POST "/pet"
+
+ -Descripción: Permite la creación repetida de objetos idénticos.
+ -Impacto: Riesgo de duplicidad de registros e inflación innecesaria de la base de datos.
+ -Recomendación: Implementar lógica de control de unicidad o UPSERT.
+
+• H08: Deficiencia en la documentación de errores
+
+ -Descripción: Los endpoints no definen estados de error (400, 422, 500) en Swagger.
+ -Impacto: Limita la capacidad de manejo de errores en el desarrollo del cliente (front-end).
+ -Recomendación: Actualizar la especificación OpenAPI (Swagger) para documentar formalmente todos los códigos de respuesta de error posibles, permitiendo que los equipos de desarrollo implementen estrategias de error handling predecibles y resilientes.
+
+• H09: Inestabilidad y errores críticos en el método PUT
+
+ -Descripción: Ante formatos inválidos, el servidor colapsa con un 500. Ante recursos inexistentes o datos erróneos, devuelve un 200 OK engañoso.
+ -Impacto: Riesgo crítico de integridad: el usuario cree que su actualización fue exitosa cuando no ocurrió nada, o el sistema cae ante peticiones mal formadas.
+ -Recomendación: Implementar bloques try-catch y validar la existencia del recurso en BD antes de confirmar cualquier actualización.
+
+
+2.Conclusiones:
+
+- La implementación del Page Object Model mediante la externalización de archivos JSON y la centralización en karate-config.js permitió crear una suite altamente mantenible, logrando una separación clara entre los datos de prueba y la lógica de ejecución.
+- El uso de Scenario Outline y archivos .feature facilitó una matriz de pruebas exhaustiva (casos positivos y negativos), reduciendo significativamente la redundancia de código.
+- La auditoría reveló brechas críticas en la validación de esquemas y en la semántica de los códigos de estado. La API presenta inconsistencias en el manejo de tipos de datos, lo que compromete la integridad de la base de datos a largo plazo.
+- Se identificó que el sistema carece de un manejo robusto de excepciones; ante parámetros inválidos, la API responde con estados genéricos o errores de servidor, dificultando la trazabilidad de los fallos.
+- El framework de Karate DSL ha funcionado como una herramienta de auditoría de seguridad y diseño, exponiendo vulnerabilidades que las pruebas manuales no habrían detectado.
+- Finalmente, laautomatización de los flujos críticos (POST, GET, PUT) establece una base sólida para identificar regresiones ante futuros despliegues, asegurando que el contrato de la API permanezca íntegro.
+
+
