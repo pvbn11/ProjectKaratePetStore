@@ -2,6 +2,11 @@
 
 Proyecto de automatización de servicios REST para la API de PetStore, implementado con **Karate DSL** para validar los casos de negocio solicitados.
 
+## Repositorio del Proyecto
+
+Puedes encontrar el código fuente y la documentación completa en:
+https://github.com/pvbn11/ProjectKaratePetStore
+
 ## Requisitos
 - Java JDK 17 o superior.
 - Apache Maven.
@@ -16,4 +21,3 @@ Proyecto de automatización de servicios REST para la API de PetStore, implement
 Ejecuta los tests mediante Maven:
 ```bash
 mvn test
-

@@ -1,4 +1,8 @@
-Proyecto Automatización de Pruebas para API REST de la plataforma "Pet Store" con Karate DSL
+======================================================
+PROYECTO: Automatización de API PetStore - Karate DSL
+AUTOR: Paolo Neil Valladares Bazalar
+REPOSITORIO: https://github.com/pvbn11/ProjectKaratePetStore
+======================================================
 
 1.Informe de Hallazgos:
 

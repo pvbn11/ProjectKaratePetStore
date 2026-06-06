@@ -1,3 +1,7 @@
+  # Autor: Paolo Neil Valladares Bazalar
+  # Repositorio: https://github.com/pvbn11/ProjectKaratePetStore
+  # Descripción: Suite de automatización para la API de PetStore
+    
 @PetFeature
 Feature: Everything about your pets
 
